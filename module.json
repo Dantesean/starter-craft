@@ -1,0 +1,18 @@
+{
+   "slug": "starter-craft",
+
+   "name": "includable-modules/starter-craft",
+   "title": "React Craft",
+   "description": "Showing how to build an Craft website using Includable.",
+
+   "controllers": {
+      "web": "web/index.php"
+   },
+
+   "webOptions": {
+      "catchAll": true,
+      "publicPaths": [
+         "**"
+      ]
+   }
+}

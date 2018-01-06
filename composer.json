@@ -1,0 +1,13 @@
+{
+   "require": {
+      "craftcms/cms": "^3.0.0-RC3"
+   },
+   "config": {
+      "optimize-autoloader": true
+   },
+   "autoload": {
+      "psr-0": {
+         "CraftCompatibility\\": "web/"
+      }
+   }
+}
