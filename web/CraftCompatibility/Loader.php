@@ -10,6 +10,10 @@ namespace CraftCompatibility;
 use Input;
 use Sandbox\Container;
 use Sandbox\Route;
+use Mimey\MimeTypes;
+
+ini_set('display_errors',0);
+error_reporting(E_ERROR);
 
 /**
  * Class Loader
@@ -70,7 +74,8 @@ class Loader
             $name = implode('/', $path_segments);
 
             if(file_exists($name)) {
-                $mime = mime_content_type($name);
+                $mimes = new MimeTypes;
+                $mime = $mimes->getMimeType(substr($name, strrpos($name, '.') + 1));
                 if($mime == 'text/plain') {
                     $mime = 'text/' . substr($name, strrpos($name, '.') + 1);
                 }

@@ -1,6 +1,7 @@
 {
    "require": {
-      "craftcms/cms": "^3.0.0-RC3"
+      "craftcms/cms": "3.0.0-RC6",
+      "ralouphie/mimey": "^1.0.8"
    },
    "config": {
       "optimize-autoloader": true
