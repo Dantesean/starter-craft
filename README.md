@@ -14,7 +14,6 @@ Keep the terminal command running in the background, and you can start developin
 
 ## TODO
 
-- [ ] License key is not saved properly
 - [ ] Support for multiple user accounts
 - [ ] Persistent storage volumes
 - [ ] Includable email handler

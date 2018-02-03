@@ -12,7 +12,7 @@ use Sandbox\Container;
 use Sandbox\Route;
 use Mimey\MimeTypes;
 
-ini_set('display_errors',0);
+ini_set('display_errors', 0);
 error_reporting(E_ERROR);
 
 /**
@@ -32,6 +32,20 @@ class Loader
     {
         // Disable Scholica UI and output
         $container->response->cancel_standard_output();
+
+        // Make sure there is a licence file that can be written to
+        define('CRAFT_LICENSE_KEY_PATH', '/tmp/craft.license.' . crc32(community()->id));
+        $license_key = community()->attr('craft-license-key');
+        if($license_key) {
+            file_put_contents(CRAFT_LICENSE_KEY_PATH, $license_key);
+        }
+
+        // Storage directory path
+        $temp_storage_path = '/tmp/craft.storage.' . crc32(community()->id);
+        if(!file_exists($temp_storage_path)) {
+            mkdir($temp_storage_path, 0777);
+        }
+        define('CRAFT_STORAGE_PATH', $temp_storage_path);
 
         // Project root path
         define('CRAFT_BASE_PATH', $container->module->path);
@@ -98,6 +112,11 @@ class Loader
         // Load Craft bootstrap
         $app = require CRAFT_BASE_PATH . 'vendor/craftcms/cms/bootstrap/web.php';
         $app->run();
+
+        // Save the licence back to the database
+        if(file_exists(CRAFT_LICENSE_KEY_PATH)) {
+            community()->attr('craft-license-key', file_get_contents(CRAFT_LICENSE_KEY_PATH));
+        }
     }
 
 }
