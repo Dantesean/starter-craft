@@ -26,5 +26,6 @@ return [
     'devMode' => gethostname() === 'sadev.io',
     'omitScriptNameInUrls' => true,
     'pageTrigger' => 'pg',
-    'pathParam' => 'px'
+    'pathParam' => 'px',
+    'allowUpdates' => false
 ];

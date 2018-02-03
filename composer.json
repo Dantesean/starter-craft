@@ -1,6 +1,7 @@
 {
    "require": {
-      "craftcms/cms": "3.0.0-RC6",
+      "enshrined/svg-sanitize": "dev-master as 0.8.2",
+      "craftcms/cms": "3.0.0-RC8",
       "ralouphie/mimey": "^1.0.8"
    },
    "config": {
@@ -10,5 +11,11 @@
       "psr-0": {
          "CraftCompatibility\\": "web/"
       }
-   }
+   },
+   "repositories": [
+      {
+         "type": "vcs",
+         "url": "https://github.com/includable/svg-sanitizer.git"
+      }
+   ]
 }
