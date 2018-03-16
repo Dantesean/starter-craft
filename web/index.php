@@ -12,6 +12,13 @@
  * templates and displaying them to the user. In this case, it simply loads the Craft CMS Yii application.
  */
 
-require 'web/CraftCompatibility/Loader.php';
+use Includable\CraftCompatibility\Loader;
 
-\CraftCompatibility\Loader::loadInContainer($this);
+// Check if Composer dependencies are already installed
+if(!file_exists($this->module->path . 'vendor/autoload.php')) {
+    echo 'Installing Composer dependencies... <meta http-equiv="refresh" content="5">';
+    exit;
+}
+
+// Load Craft
+Loader::loadInContainer($this);

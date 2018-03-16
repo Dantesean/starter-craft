@@ -11,7 +11,7 @@
 
 return [
     'modules' => [
-        'compatibility' => CraftCompatibility\CompatibilityPlugin::class
+        'compatibility' => Includable\CraftCompatibility\CompatibilityPlugin::class
     ],
     'bootstrap' => ['compatibility']
 ];
