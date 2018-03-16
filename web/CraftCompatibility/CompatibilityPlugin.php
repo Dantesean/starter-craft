@@ -38,9 +38,11 @@ class CompatibilityPlugin extends Plugin
         Craft::$app->set('user', User::class);
 
         // Install Craft site
-        if(!Craft::$app->getSites()->currentSite) {
+        try {
+            Craft::$app->getSites()->currentSite;
+        } catch(\Exception $exception) {
             // Craft hasn't been installed yet
-            $this->installSite();
+            self::installSite();
 
             return;
         }
@@ -56,7 +58,7 @@ class CompatibilityPlugin extends Plugin
      * @throws MigrationException
      * @throws Exception
      */
-    protected function installSite()
+    public static function installSite()
     {
         $site = new Site([
             'name' => community()->title,
@@ -84,6 +86,8 @@ class CompatibilityPlugin extends Plugin
         foreach($migrator->getNewMigrations() as $name) {
             $migrator->addMigrationHistory($name);
         }
+
+        community()->attr('craft_installed', true);
 
         redirect('/admin');
     }

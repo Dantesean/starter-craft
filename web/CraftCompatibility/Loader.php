@@ -7,6 +7,7 @@
 
 namespace CraftCompatibility;
 
+use Exception;
 use Input;
 use Sandbox\Container;
 use Sandbox\Route;
@@ -27,6 +28,7 @@ class Loader
      * Load Craft CMS in Includable Container.
      *
      * @param Container $container
+     * @throws Exception
      */
     public static function loadInContainer($container)
     {
