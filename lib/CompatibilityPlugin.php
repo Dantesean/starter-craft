@@ -66,8 +66,7 @@ class CompatibilityPlugin extends Plugin
                 'name' => 'Uploads',
                 'handle' => 'uploads',
                 'type' => 'Includable\\CraftCompatibility\\Volume',
-                'hasUrls' => true,
-                'url' => '//lowcdn.com/'
+                'hasUrls' => false
             ]));
         }
 
