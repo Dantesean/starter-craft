@@ -70,12 +70,7 @@ class IncludableAdapter extends AbstractAdapter
      */
     protected function upload($path, $body, Config $config, $is_stream = false)
     {
-        dd($path);
-
         $key = $this->applyPathPrefix($path);
-
-        dd($key);
-        dd($body);
 
         if(!$is_stream) {
             $mime = $config->get('mimetype') ?: Util::guessMimeType($path, $body);
@@ -92,9 +87,7 @@ class IncludableAdapter extends AbstractAdapter
             }
             $token = $this->cdn->upload($tmp_file, 'x', 'Untitled', basename($path));
         }
-        dd($token);
         $url = $this->cdn->get($token);
-        dd($url);
         $remote_path = parse_url($url, PHP_URL_PATH);
 
         $info = array_merge([
@@ -111,6 +104,23 @@ class IncludableAdapter extends AbstractAdapter
         $this->collection->add($info);
 
         return $info;
+    }
+
+    /**
+     * @param string $path
+     * @return array|false
+     */
+    protected function getFile($path)
+    {
+        $key = $this->applyPathPrefix($path);
+
+        foreach($this->collection->all() as $item) {
+            if($item->key == $key) {
+                return $item->data;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -221,14 +231,20 @@ class IncludableAdapter extends AbstractAdapter
      */
     public function readStream($path)
     {
-        $this->reopenArchive();
-        $location = $this->applyPathPrefix($path);
 
-        if(!$stream = $this->archive->getStream($location)) {
+        $file = $this->getFile($path);
+        de($file);
+        if(!$file) {
             return false;
         }
 
-        return compact('stream');
+        $url = preg_replace('/^\/\//', 'https://', $file['url']);
+
+        $fp = fopen($url, 'r');
+
+        return [
+            'stream' => $fp
+        ];
     }
 
     /**
@@ -241,7 +257,7 @@ class IncludableAdapter extends AbstractAdapter
         $pathPrefix = $this->getPathPrefix();
         $prefixLength = strlen($pathPrefix);
 
-        $res =  array_filter(array_map(function($item) use ($pathPrefix, $prefixLength) {
+        $res = array_filter(array_map(function($item) use ($pathPrefix, $prefixLength) {
             if($pathPrefix && (substr($item['name'], 0, $prefixLength) !== $pathPrefix || $item['name'] === $pathPrefix)) {
                 return false;
             }

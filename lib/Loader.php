@@ -7,6 +7,7 @@
 
 namespace Includable\CraftCompatibility;
 
+use Core\HTTP;
 use Exception;
 use Input;
 use Sandbox\Container;
@@ -34,6 +35,8 @@ class Loader
     {
         // Disable Scholica UI and output
         $container->response->cancel_standard_output();
+        global $controller;
+        $controller->noHeaders = true;
 
         // Make sure there is a licence file that can be written to
         define('CRAFT_LICENSE_KEY_PATH', '/tmp/craft.license.' . crc32(community()->id));
@@ -64,7 +67,7 @@ class Loader
                 $_SERVER['HTTP_X_REWRITE_URL'] = implode('?', $url);
             }
             $px = explode('?', trim($_SERVER['HTTP_X_REWRITE_URL'], '/'), 2);
-            $_GET['px'] = $px[0];
+            $_GET['px'] = preg_replace('/\/index\.php$/', '', $px[0]);
         }
 
         // Redirect login or logout requests
@@ -95,7 +98,7 @@ class Loader
                 if($mime == 'text/plain') {
                     $mime = 'text/' . substr($name, strrpos($name, '.') + 1);
                 }
-                $container->response->mime($mime);
+                HTTP::contentType($mime);
 
                 echo file_get_contents($name);
 
