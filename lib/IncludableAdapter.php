@@ -90,8 +90,9 @@ class IncludableAdapter extends AbstractAdapter
         $url = $this->cdn->get($token);
         $remote_path = parse_url($url, PHP_URL_PATH);
 
-        $info = array_merge([ // TODO: add 'size' and 'name'
+        $info = array_merge([
             'local_name' => $path,
+            'name' => basename($path),
             'key' => $key,
             'type' => 'file',
             'token' => $token,
@@ -150,12 +151,18 @@ class IncludableAdapter extends AbstractAdapter
      */
     public function rename($path, $newpath)
     {
-        // FIXME
+        $file = $this->getFile($path);
+        if(!$file) {
+            return false;
+        }
 
-//        $source = $this->applyPathPrefix($path);
-//        $destination = $this->applyPathPrefix($newpath);
-//
-//        return $this->archive->renameName($source, $destination);
+        $newkey = $this->applyPathPrefix($newpath);
+        $newfile = array_merge($file->data, [
+            'local_name' => $newpath,
+            'key' => $newkey
+        ]);
+
+        return (bool)$this->collection->update($file->id, $newfile);
     }
 
     /**
@@ -164,7 +171,7 @@ class IncludableAdapter extends AbstractAdapter
     public function delete($path)
     {
         $file = $this->getFile($path);
-        if(!$file){
+        if(!$file) {
             return false;
         }
 
@@ -176,25 +183,16 @@ class IncludableAdapter extends AbstractAdapter
      */
     public function deleteDir($dirname)
     {
-        // FIXME
+        $path_prefix = $this->applyPathPrefix($dirname);
+        $prefix_length = strlen($path_prefix);
 
-//        // This is needed to ensure the right number of
-//        // files are set to the $numFiles property.
-//        $this->reopenArchive();
-//
-//        $location = $this->applyPathPrefix($dirname);
-//        $path = Util::normalizePrefix($location, '/');
-//        $length = strlen($path);
-//
-//        for($i = 0; $i < $this->archive->numFiles; $i++) {
-//            $info = $this->archive->statIndex($i);
-//
-//            if(substr($info['name'], 0, $length) === $path) {
-//                $this->archive->deleteIndex($i);
-//            }
-//        }
-//
-//        return $this->archive->deleteName($dirname);
+        foreach($this->collection->all() as $item) {
+            if(substr($item->data['name'], 0, $prefix_length) === $path_prefix) {
+                $this->collection->delete($item->id);
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -223,14 +221,20 @@ class IncludableAdapter extends AbstractAdapter
      */
     public function read($path)
     {
-        $this->reopenArchive();
-        $location = $this->applyPathPrefix($path);
-
-        if(!$contents = $this->archive->getFromName($location)) {
+        $file = $this->getFile($path);
+        if(!$file) {
             return false;
         }
 
-        return compact('contents');
+        $url = preg_replace('/^\/\//', 'https://', $file->data['url']);
+        $contents = file_get_contents($url);
+        if(empty($contents) || !$contents) {
+            return false;
+        }
+
+        return [
+            'contents' => $contents
+        ];
     }
 
     /**
@@ -256,18 +260,13 @@ class IncludableAdapter extends AbstractAdapter
      */
     public function listContents($dirname = '', $recursive = false)
     {
-        $result = $this->collection->all();
-
-        $path_prefix = $this->getPathPrefix();
+        $path_prefix = $this->applyPathPrefix($dirname);
         $prefix_length = strlen($path_prefix);
 
         return array_filter(array_map(function($item) use ($path_prefix, $prefix_length) {
-            if($path_prefix && (substr($item['name'], 0, $prefix_length) !== $path_prefix)) {
-                return false;
-            }
-
-            return $item->data;
-        }, $result));
+            return $path_prefix && (substr($item['name'], 0, $prefix_length) !== $path_prefix)
+                ? false : $item->data;
+        }, $this->collection->all()));
     }
 
     /**
@@ -275,16 +274,12 @@ class IncludableAdapter extends AbstractAdapter
      */
     public function getMetadata($path)
     {
-        $location = $this->applyPathPrefix($path);
-
-        $items = $this->collection->all();
-        foreach($items as $item) {
-            if($item->local_path == $location || $item->local_path == $path || $item->key == $location) {
-                return $item->data;
-            }
+        $file = $this->getFile($path);
+        if(!$file) {
+            return false;
         }
 
-        return false;
+        return $file->data;
     }
 
     /**
@@ -400,11 +395,6 @@ class IncludableAdapter extends AbstractAdapter
      */
     public function getVisibility($path)
     {
-        $file = $this->getFile($path);
-        if(!$file) {
-            return false;
-        }
-
-        return $file->data;
+        return $this->getMetadata($path);
     }
 }
