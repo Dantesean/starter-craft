@@ -5,7 +5,7 @@
    "description": "Showing how to build an Craft website using Includable.",
 
    "controllers": {
-      "web": "lib/index.php"
+      "web": "vendor/includable/craft-compatibility/web/index.php"
    },
    "webOptions": {
       "catchAll": true,
