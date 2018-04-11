@@ -1,8 +1,8 @@
 {
    "require": {
       "enshrined/svg-sanitize": "dev-master as 0.8.2",
-      "craftcms/cms": "3.0.0-RC17.1",
-      "includable/craft-compatibility": "3.0.0-RC17"
+      "craftcms/cms": "^3.0.0",
+      "includable/craft-compatibility": "^3.0.0"
    },
    "config": {
       "optimize-autoloader": true
