@@ -5,7 +5,7 @@
 Follow these steps to get started:
 
 1. Make sure you have the latest version of the [Includable CLI](https://docs.includable.com/getting-started/cli/) installed: `npm install -g includable`
-2. Create a new module by running: `inc start craft`
+2. Create a new module by running: `inc create craft`
 3. Update the [module.json file](module.json) with your own _title_ and _description_
 4. Run the module on Includable: `inc run`
 
